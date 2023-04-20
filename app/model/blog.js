@@ -29,7 +29,6 @@ module.exports = app => {
       },
       title: { type: String, default: '', require: true },
       content: { type: String, default: '' },
-      mdData: { type: String, default: '' },
       cover: { type: String, default: '' },
       status: {
         type: String,
