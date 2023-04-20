@@ -41,7 +41,7 @@ module.exports = app => {
       },
       rejectReason: { type: String, default: '' },
       sort: { type: String, default: '', require: true },
-      description: { type: String, default: '', require: true },
+      summary: { type: String, default: '', require: true },
       tags: {
         type: Array,
         validate: arr => {

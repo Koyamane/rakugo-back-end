@@ -18,7 +18,7 @@ module.exports = app => {
       nickname: { type: String, trim: true, default: '' },
       avatar: {
         type: String,
-        default: 'https://yamanesi-1258339807.cos.ap-guangzhou.myqcloud.com/avatar/default_avatar.png',
+        default: 'https://rakugo-1258339807.cos.ap-guangzhou.myqcloud.com/avatar/default_avatar.png',
       },
       post: { type: String, trim: true, default: '' }, // 岗位
       signature: { type: String, trim: true, default: "这个人很神秘(●'◡'●)" }, // 个性签名

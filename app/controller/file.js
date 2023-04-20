@@ -3,6 +3,11 @@
 const Controller = require('egg').Controller;
 
 class FileController extends Controller {
+  async uploadMultipleFile() {
+    const { ctx } = this;
+    await ctx.returnService(ctx.service.upload.uploadMultipleFile(ctx.request.body.filePrefixs || 'other/'));
+  }
+
   async uploadFile() {
     const { ctx } = this;
     await ctx.returnService(ctx.service.upload.uploadFile(ctx.request.body.filePrefix || 'other/'));

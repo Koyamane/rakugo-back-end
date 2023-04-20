@@ -11,9 +11,9 @@ module.exports = app => {
         require: true,
       },
       value: String || Number || Boolean,
-      valueZh: String || Number || Boolean,
-      valueEn: String || Number || Boolean,
-      valueJa: String || Number || Boolean,
+      value_zh: String || Number || Boolean,
+      value_en: String || Number || Boolean,
+      value_ja: String || Number || Boolean,
     },
     { versionKey: false, _id: false }
   );
