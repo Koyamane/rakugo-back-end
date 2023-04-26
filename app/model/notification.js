@@ -30,6 +30,9 @@ module.exports = app => {
       //   default: () => ([ new Date(), new Date() ]),
       // },
       title: { type: String, default: '' },
+      title_zh: { type: String, default: '' },
+      title_en: { type: String, default: '' },
+      title_ja: { type: String, default: '' },
       order: { type: Number, default: 1 },
       status: {
         type: String,
