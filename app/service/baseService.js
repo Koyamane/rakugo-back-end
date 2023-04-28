@@ -29,6 +29,8 @@ class BaseService extends Service {
    *  dto?: {[key: String]: String}
    *  searchMap?: {[key: String]: { opt: 'LIKE' | 'IN' | 'NOT_IN', value: String }}
    *  betweenMap?: {[key: String]: String[]}
+   *  orMap?: {[key: String]: String}
+   *  norMap?: {[key: String]: String}
    *  current?: Number
    *  pageSize?: Number
    *  sort?: {[key: String]: 1 | -1}
@@ -37,6 +39,9 @@ class BaseService extends Service {
    * dto: 精确查找
    * searchMap: 精确查找，LIKE 模糊查询，IN 查询多个，NOT_IN 排除多个，多个用逗号分隔
    * betweenMap: 查询日期 YYYY-MM-DD HH:mm:ss
+   * orMap: 多字段或
+   * norMap: 多字段非或
+   * current: 第几页
    * current: 第几页
    * pageSize: 一页多少条
    * sort: 排序 1升序 -1降序
@@ -46,9 +51,11 @@ class BaseService extends Service {
   async queryPage(defaultParams = {}, cb) {
     const { body = {} } = this.ctx.request;
 
-    let dto = { ...defaultParams.dto, ...body.dto };
+    const dto = { ...defaultParams.dto, ...body.dto };
     const searchMap = { ...defaultParams.searchMap, ...body.searchMap };
     const betweenMap = { ...defaultParams.betweenMap, ...body.betweenMap };
+    const orMap = { ...defaultParams.orMap, ...body.orMap };
+    const norMap = { ...defaultParams.norMap, ...body.norMap };
     const current = body.current || defaultParams.current || 1;
     const pageSize = body.pageSize || defaultParams.pageSize || 10;
     const sort = { ...defaultParams.sort, ...body.sort };
@@ -62,21 +69,17 @@ class BaseService extends Service {
         }
 
         if (str.opt && str.opt.toUpperCase() === 'IN') {
+          const strArr = str.value.split(',').map(item => new RegExp(item));
+          dto[key] = { $in: strArr };
+        }
+
+        if (str.opt && str.opt.toUpperCase() === 'NOT_IN') {
           const strArr = str.value.split(',');
           const regStr = strArr.reduce(
             (pre, next) => (pre ? `${pre}|${next}` : `${next}`),
             ''
           );
-          dto[key] = new RegExp(`^(${regStr})$`);
-        }
-
-        if (str.opt && str.opt.toUpperCase() === 'NOT_IN') {
-          const strArr = str.value.split(',');
-          const regStr = strArr.reduce((pre, next) => {
-            return pre ? `${pre}${next ? `|(^${next}$)` : ''}` : `(^${next}$)`;
-          }, '');
-
-          dto[key] = new RegExp(`^$|^((?!${regStr}).)+$`);
+          dto[key] = { $not: new RegExp(`(${regStr})`) };
         }
       }
     }
@@ -86,22 +89,33 @@ class BaseService extends Service {
         const dateArr = betweenMap[key];
         if (Array.isArray(dateArr) && dateArr.length > 0) {
           dto[key] = {
-            $gte: dateArr[0] ? Date.parse(dateArr[0]) : Date.now(),
-            $lte: dateArr[1] ? Date.parse(dateArr[1]) : Date.now(),
+            $gte: new Date(dateArr[0] || null),
+            $lte: new Date(dateArr[1] || null),
           };
         }
       }
     }
 
-    // 说明是“或”关系
-    if (defaultParams.isOr || body.isOr) {
-      const orSearch = { $or: [] };
-      for (const key in dto) {
-        if (Object.hasOwnProperty.call(dto, key)) {
-          orSearch.$or.push({ [key]: dto[key] });
-        }
+    const orArr = [];
+    for (const key in orMap) {
+      if (Object.hasOwnProperty.call(orMap, key)) {
+        orArr.push({ [key]: new RegExp(orMap[key]) });
       }
-      dto = orSearch;
+    }
+
+    if (orArr.length) {
+      dto.$or = orArr;
+    }
+
+    const $nor = [];
+    for (const key in norMap) {
+      if (Object.hasOwnProperty.call(norMap, key)) {
+        $nor.push({ key: new RegExp(norMap[key]) });
+      }
+    }
+
+    if ($nor.length) {
+      dto.$nor = $nor;
     }
 
     // 总数
@@ -128,6 +142,8 @@ class BaseService extends Service {
     *  dto?: {[key: String]: String}
     *  searchMap?: {[key: String]: { opt: 'LIKE' | 'IN' | 'NOT_IN', value: String }}
     *  betweenMap?: {[key: String]: String[]}
+    *  orMap?: {[key: String]: String}
+    *  norMap?: {[key: String]: String}
     *  current?: Number
     *  pageSize?: Number
     *  sort?: {[key: String]: 1 | -1}
@@ -136,6 +152,8 @@ class BaseService extends Service {
     * dto: 精确查找
     * searchMap: 精确查找，LIKE 模糊查询，IN 查询多个，NOT_IN 排除多个，多个用逗号分隔
     * betweenMap: 查询日期 YYYY-MM-DD HH:mm:ss
+    * orMap: 多字段或
+    * norMap: 多字段非或
     * current: 第几页
     * pageSize: 一页多少条
     * sort: 排序 1升序 -1降序
@@ -164,9 +182,11 @@ class BaseService extends Service {
 
     const { body = {} } = this.ctx.request;
 
-    let dto = { ...defaultParams.dto, ...body.dto };
+    const dto = { ...defaultParams.dto, ...body.dto };
     const searchMap = { ...defaultParams.searchMap, ...body.searchMap };
     const betweenMap = { ...defaultParams.betweenMap, ...body.betweenMap };
+    const orMap = { ...defaultParams.orMap, ...body.orMap };
+    const norMap = { ...defaultParams.norMap, ...body.norMap };
     const current = body.current || defaultParams.current || 1;
     const pageSize = body.pageSize || defaultParams.pageSize || 10;
     const sort = { ...defaultParams.sort, ...body.sort };
@@ -180,21 +200,17 @@ class BaseService extends Service {
         }
 
         if (str.opt && str.opt.toUpperCase() === 'IN') {
+          const strArr = str.value.split(',').map(item => new RegExp(item));
+          dto[key] = { $in: strArr };
+        }
+
+        if (str.opt && str.opt.toUpperCase() === 'NOT_IN') {
           const strArr = str.value.split(',');
           const regStr = strArr.reduce(
             (pre, next) => (pre ? `${pre}|${next}` : `${next}`),
             ''
           );
-          dto[key] = new RegExp(`^(${regStr})$`);
-        }
-
-        if (str.opt && str.opt.toUpperCase() === 'NOT_IN') {
-          const strArr = str.value.split(',');
-          const regStr = strArr.reduce((pre, next) => {
-            return pre ? `${pre}${next ? `|(^${next}$)` : ''}` : `(^${next}$)`;
-          }, '');
-
-          dto[key] = new RegExp(`^$|^((?!${regStr}).)+$`);
+          dto[key] = { $not: new RegExp(`(${regStr})`) };
         }
       }
     }
@@ -204,22 +220,33 @@ class BaseService extends Service {
         const dateArr = betweenMap[key];
         if (Array.isArray(dateArr) && dateArr.length > 0) {
           dto[key] = {
-            $gte: dateArr[0] ? Date.parse(dateArr[0]) : Date.now(),
-            $lte: dateArr[1] ? Date.parse(dateArr[1]) : Date.now(),
+            $gte: new Date(dateArr[0] || null),
+            $lte: new Date(dateArr[1] || null),
           };
         }
       }
     }
 
-    // 说明是“或”关系
-    if (defaultParams.isOr || body.isOr) {
-      const orSearch = { $or: [] };
-      for (const key in dto) {
-        if (Object.hasOwnProperty.call(dto, key)) {
-          orSearch.$or.push({ [key]: dto[key] });
-        }
+    const orArr = [];
+    for (const key in orMap) {
+      if (Object.hasOwnProperty.call(orMap, key)) {
+        orArr.push({ [key]: new RegExp(orMap[key]) });
       }
-      dto = orSearch;
+    }
+
+    if (orArr.length) {
+      dto.$or = orArr;
+    }
+
+    const $nor = [];
+    for (const key in norMap) {
+      if (Object.hasOwnProperty.call(norMap, key)) {
+        $nor.push({ key: new RegExp(norMap[key]) });
+      }
+    }
+
+    if ($nor.length) {
+      dto.$nor = $nor;
     }
 
     // 总数
