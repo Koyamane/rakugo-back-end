@@ -273,12 +273,14 @@ class UserService extends BaseService {
     const { ctx } = this;
     const params = { ...defaultParams, ...ctx.request.body };
 
+    let userInfo = null;
+
     if (!Object.keys(params).length) {
       // 没传值就返回当前用户
-      return ctx.getCurrentUserInfo();
+      userInfo = await ctx.getCurrentUserInfo();
+    } else {
+      userInfo = await this.document.findOne(params, { password: 0, _id: 0 });
     }
-
-    const userInfo = await this.document.findOne(params, { password: 0, _id: 0 });
 
     if (!userInfo) {
       return {
