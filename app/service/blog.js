@@ -201,29 +201,14 @@ class BlogService extends BaseService {
       };
     }
 
-    // 游客或者未通过审核的，直接返回
-    if (!params.userId || blogInfo.status !== 'APPROVED') return blogInfo;
+    // 说明要增加阅读量
+    if (Number(params.addRead)) {
+      blogInfo.reads++;
 
-    const { ctx } = this;
-    const { userId, id: targetId } = params;
-
-    const blogDataInfo = await ctx.model.AssociationData.findOne({ targetId, targetType: 'Blog' });
-
-    if (blogDataInfo) {
-      if (userId !== blogDataInfo.userId && !blogDataInfo.readArr.includes(userId)) {
-        blogInfo.reads++;
-
-        // 不是自己看自己且自己从没看过
-        blogDataInfo.readArr.push(userId);
-        await ctx.model.AssociationData.updateOne(
-          { id: blogDataInfo.id },
-          { $set: { readArr: blogDataInfo.readArr, updateDate: new Date() } }
-        );
-        await this.document.updateOne(
-          { id: blogInfo.id },
-          { $set: { reads: blogDataInfo.readArr.length } }
-        );
-      }
+      await this.document.updateOne(
+        { id: blogInfo.id },
+        { $set: { reads: blogInfo.reads } }
+      );
     }
 
     return blogInfo;

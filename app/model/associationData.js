@@ -27,14 +27,14 @@ module.exports = app => {
       username: { type: String, default: '' },
       createdDate: { type: Date, default: () => new Date() },
       updateDate: { type: Date, default: () => new Date() },
-      readArr: { // 保存的是用户 id
-        type: Array,
-        validate: arr => {
-          // 必须全是 number
-          return arr.every(item => typeof item === 'number');
-        },
-        default: [],
-      },
+      // readArr: { // 保存的是用户 id
+      //   type: Array,
+      //   validate: arr => {
+      //     // 必须全是 number
+      //     return arr.every(item => typeof item === 'number');
+      //   },
+      //   default: [],
+      // },
       likeArr: { // 保存的是用户 id
         type: Array,
         validate: arr => {
