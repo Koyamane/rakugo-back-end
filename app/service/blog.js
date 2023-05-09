@@ -201,8 +201,32 @@ class BlogService extends BaseService {
       };
     }
 
-    // 未通过审核的，直接返回
-    if (blogInfo.status !== 'APPROVED') return blogInfo;
+    // 未通过审核的单据时
+    if (blogInfo.status !== 'APPROVED') {
+      const userInfo = await this.ctx.getCurrentUserInfo();
+
+      // 游客返回 404
+      if (!userInfo) {
+        return {
+          success: false,
+          data: null,
+          errorCode: 404,
+          showType: 0,
+        };
+      }
+
+      // 如果不是管理员，并且不是自己的单时，返回 404
+      if (userInfo.access !== 'admin' && blogInfo.createdId !== userInfo.userId) {
+        return {
+          success: false,
+          data: null,
+          errorCode: 404,
+          showType: 0,
+        };
+      }
+
+      return blogInfo;
+    }
 
     // 说明要增加阅读量
     if (Number(params.addRead)) {
