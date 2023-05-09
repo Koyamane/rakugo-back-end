@@ -201,6 +201,9 @@ class BlogService extends BaseService {
       };
     }
 
+    // 未通过审核的，直接返回
+    if (blogInfo.status !== 'APPROVED') return blogInfo;
+
     // 说明要增加阅读量
     if (Number(params.addRead)) {
       blogInfo.reads++;
