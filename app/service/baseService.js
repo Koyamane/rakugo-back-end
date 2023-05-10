@@ -312,7 +312,7 @@ class BaseService extends Service {
     cos.deleteObject({
       Bucket: 'rakugo-1258339807',
       Region: 'ap-guangzhou',
-      Key: new URL(delFile).pathname,
+      Key: decodeURIComponent(new URL(delFile).pathname),
     });
   }
 
@@ -381,7 +381,7 @@ class BaseService extends Service {
       cos.deleteObject({
         Bucket: 'rakugo-1258339807',
         Region: 'ap-guangzhou',
-        Key: new URL(delFile).pathname,
+        Key: decodeURIComponent(new URL(delFile).pathname),
       });
     }
 

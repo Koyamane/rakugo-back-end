@@ -127,7 +127,7 @@ class UploadService extends BaseService {
     // deleteMultipleObject 接口是只接收 avatar/default_avatar.png
     // { Key: 'avatar/default_avatar.png' }
     const arr = delFile.map(item => ({
-      Key: new URL(item).pathname.substring(1),
+      Key: decodeURIComponent(new URL(item).pathname.substring(1)),
     }));
 
     await cos.deleteMultipleObject({
