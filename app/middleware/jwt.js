@@ -37,9 +37,6 @@ module.exports = (options, app) => {
         return;
       }
 
-      // 延长登录时间，不需要同步
-      ctx.service.cache.redis.set(userInfo.userId, userInfo, app.config.session.maxAge);
-
       await next();
     } catch (error) {
       ctx.status = 401;
