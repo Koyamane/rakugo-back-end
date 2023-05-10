@@ -15,10 +15,11 @@ module.exports = app => {
   require('./router/blog')(app, jwt);
   require('./router/user')(app, jwt);
   require('./router/file')(app, jwt);
-  require('./router/notification')(app, jwt);
   require('./router/associationData')(app, jwt);
   require('./router/collection')(app, jwt);
   require('./router/follow')(app, jwt);
   require('./router/comment')(app, jwt);
+  require('./router/notification')(app, jwtAccess);
   require('./router/dataDictionary')(app, jwtAccess);
+  require('./router/bgImage')(app, jwtAccess);
 };

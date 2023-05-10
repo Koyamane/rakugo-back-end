@@ -108,6 +108,8 @@ class BlogService extends BaseService {
     }
 
     await this.deleteSomeone(params);
+
+    return '删除成功';
   }
 
   async updateBlog(defaultParams) {
@@ -146,7 +148,6 @@ class BlogService extends BaseService {
     // string 说明没传或者是已有的链接地址，undefined 说明是新 file
     if (typeof params.cover === 'undefined') {
       // 存在就说明是字符串，不是 file
-      const blogInfo = await this.someoneInfo({ id: params.id });
       params.cover = await this.uploadFile('blog/cover/', blogInfo.cover);
     }
 
