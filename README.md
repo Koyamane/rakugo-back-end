@@ -6,7 +6,7 @@
 
 数据库为 mongodb，缓存为 redis，**请都先安装好，不然会报错**
 
-腾讯云存储桶，在 config 文件夹下面，新建一个 cos.config.js 文件，如下。有些文件里的 Bucket 和 Region 也需要换成自己的
+腾讯云存储桶，在 config 文件夹下面，新建一个 cos.config.js 文件，如下。config.local.js 和 config.prod.js 文件里的 bucket 和 region 也需要换成自己的
 
 ```js
 // config/cos.config.js

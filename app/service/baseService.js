@@ -303,15 +303,17 @@ class BaseService extends Service {
 
   /**
    * @description 不返回提示删除存储桶某个文件
-   * @param {String} delFile  删除的文件地址，例如：https://rakugo-1258339807.cos.ap-guangzhou.myqcloud.com/avatar/default_avatar.png
+   * @param {String} delFile  删除的文件地址，例如：https://yamanesi-1258339807.cos.ap-guangzhou.myqcloud.com/avatar/default_avatar.png
    */
   async deleteSomeFile(delFile) {
     if (!delFile) return;
 
+    const { config } = this;
+
     // 异步删除，失败了也不要紧
     cos.deleteObject({
-      Bucket: 'rakugo-1258339807',
-      Region: 'ap-guangzhou',
+      Bucket: config.cos.bucket,
+      Region: config.cos.region,
       Key: decodeURIComponent(new URL(delFile).pathname),
     });
   }
@@ -348,11 +350,11 @@ class BaseService extends Service {
   /**
    * @description 上传单个文件，返回请求参数及文件 url
    * @param {String} filePrefix 文件存储前缀，例如：avatar/，avatar目录下的文件
-   * @param {String} delFile  删除的文件地址，例如：https://rakugo-1258339807.cos.ap-guangzhou.myqcloud.com/avatar/default_avatar.png
+   * @param {String} delFile  删除的文件地址，例如：https://yamanesi-1258339807.cos.ap-guangzhou.myqcloud.com/avatar/default_avatar.png
    * @return { requestBody: any, fileUrl: strng }
    */
   async uploadFile(filePrefix, delFile) {
-    const { ctx } = this;
+    const { ctx, config } = this;
 
     const file = ctx.request.files[0];
 
@@ -365,8 +367,8 @@ class BaseService extends Service {
 
     // 上传
     const res = await cos.putObject({
-      Bucket: 'rakugo-1258339807',
-      Region: 'ap-guangzhou',
+      Bucket: config.cos.bucket,
+      Region: config.cos.region,
       Key: filename,
       Body: fs.createReadStream(file.filepath), // 上传文件对象
     });
@@ -379,8 +381,8 @@ class BaseService extends Service {
     if (delFile) {
       // 异步删除，失败了也不要紧
       cos.deleteObject({
-        Bucket: 'rakugo-1258339807',
-        Region: 'ap-guangzhou',
+        Bucket: config.cos.bucket,
+        Region: config.cos.region,
         Key: decodeURIComponent(new URL(delFile).pathname),
       });
     }
