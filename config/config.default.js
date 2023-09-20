@@ -81,6 +81,8 @@ module.exports = appInfo => {
 
   config.multipart = {
     mode: 'file',
+    // 白名单，.jfif 是图片格式
+    whitelist: [ '.jfif' ],
     // mode: 'stream',
     // 表单 Field 文件名长度限制
     // fieldNameSize: 100,
